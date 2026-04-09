@@ -1,0 +1,18 @@
+[
+  {
+    "jobKey": "product-tech-launch-readiness-review",
+    "name": "Product Tech Launch Readiness Review",
+    "cadence": "weekly",
+    "ownerRoleKey": "product-management-lead",
+    "projectKey": "idea-to-launch-project",
+    "goalKey": "idea-to-launch-goal"
+  },
+  {
+    "jobKey": "product-tech-reliability-review",
+    "name": "Product Tech Reliability Review",
+    "cadence": "weekly",
+    "ownerRoleKey": "technology-platform-lead",
+    "projectKey": "incident-to-resolution-project",
+    "goalKey": "incident-to-resolution-goal"
+  }
+]

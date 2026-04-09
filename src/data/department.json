@@ -1,0 +1,15 @@
+{
+  "departmentId": "product-tech",
+  "displayName": "Product & Technology Department",
+  "parentFunctionId": "product-tech",
+  "parentExecutiveRole": "product+technology",
+  "moduleId": null,
+  "summary": "Offer design, research, delivery execution, platform enablement, and reliability.",
+  "requiredSkillBundles": [
+    "uos-product-tech"
+  ],
+  "missionRefs": [
+    "idea-to-launch",
+    "incident-to-resolution"
+  ]
+}

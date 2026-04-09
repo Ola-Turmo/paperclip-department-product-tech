@@ -1,0 +1,31 @@
+{
+  "bundleIds": [
+    "uos-product-tech"
+  ],
+  "externalSkills": [
+    {
+      "id": "uos-external-user-research-synthesis",
+      "sourceRelativePath": "vendor/external-skills/ola-turmo/unified-skills-catalog/user-research-synthesis"
+    },
+    {
+      "id": "uos-external-security-review",
+      "sourceRelativePath": "vendor/external-skills/ola-turmo/unified-skills-catalog/security-review"
+    },
+    {
+      "id": "uos-external-trawl-web-extraction",
+      "sourceRelativePath": "vendor/external-skills/uos-tools/trawl-web-extraction"
+    },
+    {
+      "id": "uos-external-droid-cli-companion",
+      "sourceRelativePath": "vendor/external-skills/uos-tools/droid-cli-companion"
+    },
+    {
+      "id": "kurs-ing-course-feedback-loop",
+      "sourceRelativePath": "vendor/external-skills/kurs-ing/course-feedback-loop"
+    },
+    {
+      "id": "kurs-ing-payments-entitlements-ops",
+      "sourceRelativePath": "vendor/external-skills/kurs-ing/payments-entitlements-ops"
+    }
+  ]
+}

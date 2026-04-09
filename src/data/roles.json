@@ -1,0 +1,72 @@
+[
+  {
+    "roleKey": "product",
+    "title": "Chief Product / Offerings Officer",
+    "roleType": "executive",
+    "layer": "executive",
+    "moduleScoped": false
+  },
+  {
+    "roleKey": "technology",
+    "title": "Chief Technology & Information Officer",
+    "roleType": "executive",
+    "layer": "executive",
+    "moduleScoped": false
+  },
+  {
+    "roleKey": "product-management-lead",
+    "title": "Product Management Lead",
+    "roleType": "manager",
+    "layer": "base",
+    "moduleScoped": false
+  },
+  {
+    "roleKey": "product-research-lead",
+    "title": "Research Lead",
+    "roleType": "manager",
+    "layer": "base",
+    "moduleScoped": false
+  },
+  {
+    "roleKey": "technology-engineering-lead",
+    "title": "Engineering Lead",
+    "roleType": "manager",
+    "layer": "base",
+    "moduleScoped": false
+  },
+  {
+    "roleKey": "technology-platform-lead",
+    "title": "Platform Lead",
+    "roleType": "manager",
+    "layer": "base",
+    "moduleScoped": false
+  },
+  {
+    "roleKey": "product-ops-specialist",
+    "title": "Product Ops Specialist",
+    "roleType": "specialist",
+    "layer": "base",
+    "moduleScoped": false
+  },
+  {
+    "roleKey": "technology-sre-specialist",
+    "title": "SRE Specialist",
+    "roleType": "specialist",
+    "layer": "base",
+    "moduleScoped": false
+  },
+  {
+    "roleKey": "product-reviewer",
+    "title": "Product Reviewer",
+    "roleType": "reviewer",
+    "layer": "base",
+    "moduleScoped": false
+  },
+  {
+    "roleKey": "technology-reliability-reviewer",
+    "title": "Reliability Reviewer",
+    "roleType": "reviewer",
+    "layer": "base",
+    "moduleScoped": false
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "requiredToolkits": [
+    "github",
+    "googledrive",
+    "googledocs",
+    "slack"
+  ],
+  "roleToolkits": [
+    {
+      "roleKey": "technology",
+      "toolkits": ["github", "slack"]
+    },
+    {
+      "roleKey": "product-research-lead",
+      "toolkits": ["googledrive", "googledocs"]
+    },
+    {
+      "roleKey": "technology-platform-lead",
+      "toolkits": ["github", "slack"]
+    },
+    {
+      "roleKey": "technology-engineering-lead",
+      "toolkits": ["github"]
+    }
+  ]
+}
