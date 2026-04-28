@@ -37,6 +37,7 @@ const TOOLKIT_DISPLAY_NAMES: Record<string, string> = {
   googledrive: "Google Drive",
   googledocs: "Google Docs",
   slack: "Slack",
+  suby: "Suby",
 };
 
 // Default limitation messages per connector
@@ -45,6 +46,7 @@ const DEFAULT_LIMITATION_MESSAGES: Record<string, string> = {
   googledrive: "Google Drive integration is currently unavailable. Research document access may be limited.",
   googledocs: "Google Docs integration is currently unavailable. Documentation access may be limited.",
   slack: "Slack integration is currently unavailable. Team notifications and engineering updates may be delayed.",
+  suby: "Suby payment integration is currently unavailable. Clinic referral commission payments and checkout flows are blocked — no revenue can be collected until Suby is reconnected.",
 };
 
 /**
@@ -174,6 +176,12 @@ function getAffectedWorkflows(toolkitId: string): string[] {
       "Team notifications",
       "Engineering updates",
       "Incident alerts",
+    ],
+    suby: [
+      "Clinic referral commission payments",
+      "Checkout and payment confirmation",
+      "Revenue collection and payout tracking",
+      "Partner clinic payment settlements",
     ],
   };
 

@@ -10,7 +10,8 @@ export const connectorsConfig = {
     "github",
     "googledrive",
     "googledocs",
-    "slack"
+    "slack",
+    "suby"
   ],
   roleToolkits: [
     {
@@ -28,6 +29,10 @@ export const connectorsConfig = {
     {
       roleKey: "technology-engineering-lead",
       toolkits: ["github"]
+    },
+    {
+      roleKey: "finance-revenue-lead",
+      toolkits: ["suby"]
     }
   ]
 } as const;
