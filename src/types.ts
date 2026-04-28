@@ -281,7 +281,7 @@ export interface ToolkitLimitation {
   displayName: string;
   limitationMessage: string;
   severity: "critical" | "high" | "medium" | "low";
-  affectedWorkflows: string[];
+  affectedWorkflows: readonly string[];
   suggestedAction: string;
 }
 

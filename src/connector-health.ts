@@ -8,7 +8,8 @@
  * dependent connectors or tools are impaired.
  */
 
-import { connectorsConfig } from "./data/connectors-config.js";
+import { connectorsConfig, type ExtendedConnector } from "./data/connectors-config.js";
+export { connectorsConfig };
 import { checkToolkitHealth } from "./zapier-health.js";
 
 
@@ -20,6 +21,7 @@ export interface ConnectorHealthState {
   lastChecked: string;
   error?: string;
   limitationMessage?: string;
+  category?: ExtendedConnector["category"];
 }
 
 export interface ToolkitLimitation {
@@ -27,16 +29,22 @@ export interface ToolkitLimitation {
   displayName: string;
   limitationMessage: string;
   severity: "critical" | "high" | "medium" | "low";
-  affectedWorkflows: string[];
+  affectedWorkflows: readonly string[];
   suggestedAction: string;
+  category?: ExtendedConnector["category"];
 }
 
-// Connector display names mapping
+// Connector display names mapping — extended with Paperclip-native connectors
 const TOOLKIT_DISPLAY_NAMES: Record<string, string> = {
   github: "GitHub",
   googledrive: "Google Drive",
   googledocs: "Google Docs",
   slack: "Slack",
+  // Paperclip-native connectors
+  resend: "Resend (Email)",
+  telegram: "Telegram",
+  paperclip: "Paperclip API",
+  cloudflare: "Cloudflare",
 };
 
 // Default limitation messages per connector
@@ -45,6 +53,11 @@ const DEFAULT_LIMITATION_MESSAGES: Record<string, string> = {
   googledrive: "Google Drive integration is currently unavailable. Research document access may be limited.",
   googledocs: "Google Docs integration is currently unavailable. Documentation access may be limited.",
   slack: "Slack integration is currently unavailable. Team notifications and engineering updates may be delayed.",
+  // Paperclip-native connectors
+  resend: "Resend email integration is currently unavailable. Customer onboarding, transactional emails, and outreach may be blocked — this is a CRITICAL revenue impact.",
+  telegram: "Telegram integration is currently unavailable. Community outreach and engagement workflows are blocked.",
+  paperclip: "Paperclip API is currently unavailable. Company issue management, agent coordination, and operational context are impaired.",
+  cloudflare: "Cloudflare integration is currently unavailable. DNS management, email routing, and inbox Worker are affected — CRITICAL for Resend DNS verification.",
 };
 
 /**
@@ -55,6 +68,30 @@ export function getRequiredToolkits(): string[] {
 }
 
 /**
+ * Get all extended connectors (Paperclip-native + dev toolkits)
+ * Use this to get the full picture of company connector dependencies
+ */
+export function getExtendedConnectors(): ExtendedConnector[] {
+  return [...connectorsConfig.extendedConnectors];
+}
+
+/**
+ * Get extended connector by toolkitId
+ */
+export function getExtendedConnector(toolkitId: string): ExtendedConnector | undefined {
+  return connectorsConfig.extendedConnectors.find((c) => c.toolkitId === toolkitId);
+}
+
+/**
+ * Get all toolkit IDs (required + extended)
+ */
+export function getAllToolkitIds(): string[] {
+  const required = getRequiredToolkits();
+  const extended = connectorsConfig.extendedConnectors.map((c) => c.toolkitId);
+  return [...new Set([...required, ...extended])];
+}
+
+/**
  * Get toolkit display name
  */
 export function getToolkitDisplayName(toolkitId: string): string {
@@ -62,17 +99,24 @@ export function getToolkitDisplayName(toolkitId: string): string {
 }
 
 /**
- * Create initial connector health state for all required toolkits
+ * Create initial connector health state for all required toolkits.
+ * Optionally includes extended connectors for full company-wide view.
  */
-export function createInitialConnectorHealthState(): ConnectorHealthState[] {
-  const requiredToolkits = getRequiredToolkits();
+export function createInitialConnectorHealthState(includeExtended = false): ConnectorHealthState[] {
+  const allToolkitIds = includeExtended
+    ? getAllToolkitIds()
+    : getRequiredToolkits();
   const now = new Date().toISOString();
 
-  return requiredToolkits.map((toolkitId) => ({
-    toolkitId,
-    status: "unknown" as ConnectorHealthStatus,
-    lastChecked: now,
-  }));
+  return allToolkitIds.map((toolkitId) => {
+    const ext = getExtendedConnector(toolkitId);
+    return {
+      toolkitId,
+      status: "unknown" as ConnectorHealthStatus,
+      lastChecked: now,
+      category: ext?.category,
+    };
+  });
 }
 
 /**
@@ -122,7 +166,8 @@ export function getImpairedConnectors(
 }
 
 /**
- * Generate toolkit limitations based on impaired connectors
+ * Generate toolkit limitations based on impaired connectors.
+ * Uses extended connector registry for accurate severity, workflows, and suggestions.
  */
 export function generateToolkitLimitations(
   states: ConnectorHealthState[]
@@ -130,23 +175,31 @@ export function generateToolkitLimitations(
   const impaired = getImpairedConnectors(states);
 
   return impaired.map((connector) => {
+    const ext = getExtendedConnector(connector.toolkitId);
+
     let severity: "critical" | "high" | "medium" | "low" = "high";
     if (connector.status === "error") {
-      severity = "critical";
+      severity = ext?.severityWhenDown ?? "critical";
     } else if (connector.status === "degraded") {
-      severity = "medium";
+      severity = ext ? (severity = "medium") : "medium";
     }
 
-    // Determine affected workflows based on connector type
-    const affectedWorkflows = getAffectedWorkflows(connector.toolkitId);
+    // Use extended connector data for richer information
+    const affectedWorkflows = ext?.affectedWorkflows
+      ?? getAffectedWorkflows(connector.toolkitId);
 
     return {
       toolkitId: connector.toolkitId,
       displayName: getToolkitDisplayName(connector.toolkitId),
-      limitationMessage: connector.limitationMessage || DEFAULT_LIMITATION_MESSAGES[connector.toolkitId] || `The ${getToolkitDisplayName(connector.toolkitId)} integration is currently unavailable.`,
+      limitationMessage:
+        connector.limitationMessage
+        ?? ext?.description
+        ?? DEFAULT_LIMITATION_MESSAGES[connector.toolkitId]
+        ?? `The ${getToolkitDisplayName(connector.toolkitId)} integration is currently unavailable.`,
       severity,
       affectedWorkflows,
-      suggestedAction: getSuggestedAction(connector.toolkitId, connector.status),
+      suggestedAction: getSuggestedAction(connector.toolkitId, connector.status, ext),
+      category: ext?.category,
     };
   });
 }
@@ -181,14 +234,23 @@ function getAffectedWorkflows(toolkitId: string): string[] {
 }
 
 /**
- * Get suggested action for a connector failure
+ * Get suggested action for a connector failure.
+ * Uses extended connector registry for connector-specific guidance.
  */
 function getSuggestedAction(
   toolkitId: string,
-  status: ConnectorHealthStatus
+  status: ConnectorHealthStatus,
+  ext?: ExtendedConnector
 ): string {
+  // Use extended connector's health check endpoint for more specific guidance
   if (status === "error") {
+    if (ext?.healthCheckEndpoint) {
+      return `Reconnect ${getToolkitDisplayName(toolkitId)} (health check: ${ext.healthCheckEndpoint}). Until restored, ${ext.affectedWorkflows[0] ?? "affected workflows"} are blocked.`;
+    }
     return `Reconnect the ${getToolkitDisplayName(toolkitId)} integration to restore full functionality.`;
+  }
+  if (ext?.healthCheckEndpoint) {
+    return `Check ${getToolkitDisplayName(toolkitId)} status (${ext.healthCheckEndpoint}) and retry when connectivity is restored.`;
   }
   return `Check ${getToolkitDisplayName(toolkitId)} status and retry operations when connectivity is restored.`;
 }
@@ -246,12 +308,14 @@ export interface RuntimeHealthCheckResult {
 
 /**
  * Perform runtime health check for all required connectors.
- * 
+ * Optionally includes extended connectors for full company-wide health view.
+ *
  * XAF-007: Department workflows degrade explicitly when dependent connectors
  * or tools are impaired.
  */
 export async function performRuntimeHealthCheck(
-  currentState: ConnectorHealthState[]
+  currentState: ConnectorHealthState[],
+  includeExtended = false
 ): Promise<{
   updatedStates: ConnectorHealthState[];
   checkResults: RuntimeHealthCheckResult[];
@@ -302,6 +366,7 @@ export async function performRuntimeHealthCheck(
       lastChecked: now,
       error: healthResult.error,
       limitationMessage: DEFAULT_LIMITATION_MESSAGES[state.toolkitId],
+      category: getExtendedConnector(state.toolkitId)?.category,
     });
   }
 ;
